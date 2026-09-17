@@ -9,7 +9,7 @@ public class MovingPlatform : MonoBehaviour
     public Transform pointB;
 
     [Header("Movement Settings")]
-    public float speed = 0.5f;
+    public float speedMultiplier = 0.5f;
     public float waitTime = 1;
 
     private bool waiting = false;
@@ -24,7 +24,7 @@ public class MovingPlatform : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
       if (waiting==true)
       {
@@ -49,17 +49,19 @@ public class MovingPlatform : MonoBehaviour
     {
       if (movingTowardB)
       {
-        percentMoved += Time.deltaTime * speed;
+        percentMoved += Time.deltaTime * speedMultiplier;
         if (percentMoved >= 1)
         {
+          Debug.Log("Platform percentMoved=" + percentMoved + " at Waypoint B. Wait and then move toward Waypoint A.");
           waiting = true;
           movingTowardB = false;
         }
       } else
       {
-        percentMoved -= Time.deltaTime * speed;
+        percentMoved -= Time.deltaTime * speedMultiplier;
         if (percentMoved <= 0)
         {
+        Debug.Log("Platform percentMoved=" + percentMoved + " at Waypoint A. Wait and then move toward Waypoint B.");
         waiting = true;
         movingTowardB = true;
         }
