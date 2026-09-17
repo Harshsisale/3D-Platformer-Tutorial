@@ -843,8 +843,8 @@ PlayerSettings:
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: 3D_Platformer
-  metroPackageVersion: 
+  metroPackageName: 3DPlatformer
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -852,7 +852,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: 3D_Platformer
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: 3D_Platformer
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
