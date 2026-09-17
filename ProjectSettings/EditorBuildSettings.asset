@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Scenes/MetricPlayground.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/_Scenes/Level1.unity
+    guid: c1b4d7ad31f06724e8d11e8fbfca8fc4
+  - enabled: 1
+    path: Assets/_Scenes/Level2.unity
+    guid: 4929a12e1e4214e42a3fefafb416a486
   m_configObjects: {}
