@@ -147,6 +147,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6734ff6252583c4198161fd2da06d0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  destinationTeleporter: {fileID: 0}
+  teleportEffect: {fileID: 2419217373339753570, guid: eca3d3c4947798c458c8ffa74b6cc646,
+    type: 3}
 --- !u!1 &7082170386683034177
 GameObject:
   m_ObjectHideFlags: 0
