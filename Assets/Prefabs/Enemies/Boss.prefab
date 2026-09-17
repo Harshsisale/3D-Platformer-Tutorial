@@ -82,7 +82,7 @@ MonoBehaviour:
   returnPositionTransform: {fileID: 0}
   hitWithLineOfSight:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
 --- !u!114 &3742406886952885856
 MonoBehaviour:
   m_ObjectHideFlags: 0

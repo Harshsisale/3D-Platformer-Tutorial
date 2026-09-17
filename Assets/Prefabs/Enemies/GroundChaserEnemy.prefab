@@ -177,7 +177,7 @@ MonoBehaviour:
   returnPositionTransform: {fileID: 0}
   hitWithLineOfSight:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 384
 --- !u!1 &9152453163198267788
 GameObject:
   m_ObjectHideFlags: 0
