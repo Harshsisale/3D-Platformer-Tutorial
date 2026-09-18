@@ -43,6 +43,12 @@ public class Teleport : MonoBehaviour
             // reposition the player
             other.transform.position = destinationTeleporter.transform.position - new Vector3(0,heightOffset,0);
 
+            ThirdPersonCharacterController movement = other.GetComponent<ThirdPersonCharacterController>();
+            if (movement != null)
+            {
+                movement.ResetMovement();
+            }
+
             // if character controller is specified then turn it back on
             if (characterController != null)
             {
