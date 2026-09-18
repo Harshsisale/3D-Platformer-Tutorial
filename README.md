@@ -2,12 +2,12 @@
 
 ## Controls
 
-MOVE -> WASD or Left Stick
-Look -> Mouse or Right Stick
-Jump / Double Jump -> Space or A on controller
-Sprint -> Hold left Shift or Hold left stick click
-Dash -> E on keyboard or B on controller
-Pause -> Escape or Start/Back
+MOVE -> WASD or Left Stick  
+Look -> Mouse or Right Stick  
+Jump / Double Jump -> Space or A on controller  
+Sprint -> Hold left Shift or Hold left stick click  
+Dash -> E on keyboard or B on controller  
+Pause -> Escape or Start/Back  
 
 ## Features added beyond the tutorial
 
