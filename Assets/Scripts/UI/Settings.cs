@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,97 +11,62 @@ public class Settings : MonoBehaviour
 
     public ThirdPersonCamera playerCamera;
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
-        if (playerCamera==null)
-        {
-            playerCamera = FindObjectOfType<ThirdPersonCamera>();
-        }
+        invertX.SetIsOnWithoutNotify(PlayerPrefs.GetInt("InvertX", 0) != 0);
+        invertY.SetIsOnWithoutNotify(PlayerPrefs.GetInt("InvertY", 0) != 0);
 
-        if (PlayerPrefs.HasKey("InvertX"))
-        {
-            if (PlayerPrefs.GetInt("InvertX") != 0)
-            {
-                invertX.isOn = true;
-            } else
-            {
-                invertX.isOn = false;
-            }
-        }
-        else
-        {
-            invertX.isOn = false;
-        }
+        horizontalMouseSensitivitySlider.SetValueWithoutNotify(
+            PlayerPrefs.GetFloat("HorizontalMouseSensitivity", horizontalMouseSensitivitySlider.value));
+        verticalMouseSensitivitySlider.SetValueWithoutNotify(
+            PlayerPrefs.GetFloat("VerticalMouseSensitivity", verticalMouseSensitivitySlider.value));
 
-        if (PlayerPrefs.HasKey("InvertY"))
-        {
-            if (PlayerPrefs.GetInt("InvertY") != 0)
-            {
-                invertY.isOn = true;
-            }
-            else
-            {
-                invertY.isOn = false;
-            }
-        }
-        else
-        {
-            invertY.isOn = false;
-        }
+        PlayerPrefs.SetFloat("HorizontalMouseSensitivity", horizontalMouseSensitivitySlider.value);
+        PlayerPrefs.SetFloat("VerticalMouseSensitivity", verticalMouseSensitivitySlider.value);
+        ApplyCameraSettings();
+    }
 
-        if (PlayerPrefs.HasKey("HorizontalMouseSensitivity"))
-        {
-            horizontalMouseSensitivitySlider.value = PlayerPrefs.GetFloat("HorizontalMouseSensitivity");
-        }
-        else
-        {
-            PlayerPrefs.SetFloat("HorizontalMouseSensitivity", horizontalMouseSensitivitySlider.value);
-        }
-
-        if (PlayerPrefs.HasKey("VerticalMouseSensitivity"))
-        {
-            verticalMouseSensitivitySlider.value = PlayerPrefs.GetFloat("VerticalMouseSensitivity");
-        }
-        else
-        {
-            PlayerPrefs.SetFloat("VerticalMouseSensitivity", verticalMouseSensitivitySlider.value);
-        }
-
-        if (PlayerPrefs.HasKey("HorizontalMouseSensitivity"))
-        {
-            horizontalMouseSensitivitySlider.value = PlayerPrefs.GetFloat("HorizontalMouseSensitivity");
-        }
-        else
-        {
-            PlayerPrefs.SetFloat("HorizontalMouseSensitivity", horizontalMouseSensitivitySlider.value);
-        }
+    private void OnDisable()
+    {
+        PlayerPrefs.Save();
     }
 
     public void ChangeHorizontalMouseSensitivity()
     {
         PlayerPrefs.SetFloat("HorizontalMouseSensitivity", horizontalMouseSensitivitySlider.value);
-        playerCamera.InitialSetup();
+        ApplyCameraSettings();
     }
 
     public void ChangeVerticalMouseSensitivity()
     {
         PlayerPrefs.SetFloat("VerticalMouseSensitivity", verticalMouseSensitivitySlider.value);
-        playerCamera.InitialSetup();
+        ApplyCameraSettings();
     }
 
     public void ChangeInvertX()
     {
-        PlayerPrefs.SetInt("InvertX", (invertX.isOn ? 1 : 0));
-        if (playerCamera != null)
-        {
-            playerCamera.InitialSetup();
-        }
+        PlayerPrefs.SetInt("InvertX", invertX.isOn ? 1 : 0);
+        ApplyCameraSettings();
     }
 
     public void ChangeInvertY()
     {
-        PlayerPrefs.SetInt("InvertY", (invertY.isOn ? 1 : 0));
+        PlayerPrefs.SetInt("InvertY", invertY.isOn ? 1 : 0);
+        ApplyCameraSettings();
+    }
+
+    private void ApplyCameraSettings()
+    {
+        foreach (CinemachineCameraSettings cameraSettings in FindObjectsOfType<CinemachineCameraSettings>(true))
+        {
+            cameraSettings.ApplySettings();
+        }
+
+        if (playerCamera == null)
+        {
+            playerCamera = FindObjectOfType<ThirdPersonCamera>();
+        }
+
         if (playerCamera != null)
         {
             playerCamera.InitialSetup();

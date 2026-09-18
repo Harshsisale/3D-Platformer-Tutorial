@@ -124,6 +124,11 @@ public class Health : MonoBehaviour
         }
         transform.position = respawnPosition;
         transform.rotation = Quaternion.identity;
+        ThirdPersonCharacterController movement = GetComponent<ThirdPersonCharacterController>();
+        if (movement != null)
+        {
+            movement.ResetMovement();
+        }
         if (c != null)
         {
             c.enabled = true;
@@ -155,6 +160,10 @@ public class Health : MonoBehaviour
             timeToBecomeDamagableAgain = Time.time + invincibilityTime;
             isInvincible = true;
             currentHealth -= damageAmount;
+            if (damageAmount > 0)
+            {
+                ResetPlayerCombo();
+            }
             CheckDeath();
         }
     }
@@ -237,6 +246,7 @@ public class Health : MonoBehaviour
     /// </summary>
     protected virtual void Die()
     {
+        ResetPlayerCombo();
         if (deathEffect != null)
         {
             Instantiate(deathEffect, transform.position, transform.rotation, null);
@@ -288,6 +298,14 @@ public class Health : MonoBehaviour
         if (GameManager.instance != null && gameObject.tag == "Player")
         {
             GameManager.instance.GameOver();
+        }
+    }
+
+    private void ResetPlayerCombo()
+    {
+        if (GameManager.instance != null && GameManager.instance.player == gameObject)
+        {
+            GameManager.instance.ResetPickupCombo();
         }
     }
 }

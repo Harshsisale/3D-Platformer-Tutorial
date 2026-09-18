@@ -65,6 +65,16 @@ public class GameManager : MonoBehaviour
     [Tooltip("The highest score acheived on this device")]
     public int highScore = 0;
 
+    [Header("Pickup Combo")]
+    [Min(0.1f)]
+    [Tooltip("Seconds allowed between score pickups to keep a combo going.")]
+    public float comboWindow = 4f;
+    [Min(1)]
+    [Tooltip("The highest score multiplier a pickup chain can reach.")]
+    public int maximumComboMultiplier = 5;
+
+    public PickupCombo Combo { get; private set; }
+
     [Header("Game Progress / Victory Settings")]
     [Tooltip("Whether the game is winnable or not \nDefault: true")]
     public bool gameIsWinnable = true;
@@ -83,6 +93,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Awake()
     {
+        Combo = new PickupCombo(comboWindow, maximumComboMultiplier);
         if (instance == null)
         {
             instance = this;
@@ -118,6 +129,7 @@ public class GameManager : MonoBehaviour
             score = PlayerPrefs.GetInt("score");
         }
         InitilizeGamePlayerPrefs();
+        ComboDisplay.Create(this);
     }
 
     /// <summary>
@@ -130,7 +142,13 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        Combo.Tick(Time.time);
         UpdateUIElements();
+    }
+
+    public void ResetPickupCombo()
+    {
+        Combo?.Reset();
     }
 
 
@@ -202,6 +220,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void LevelCleared()
     {
+        ResetPickupCombo();
         if (UIManager.instance != null)
         {
             if (player != null)
@@ -248,6 +267,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void GameOver()
     {
+        ResetPickupCombo();
         gameIsOver = true;
         if (gameOverEffect != null)
         {
@@ -291,6 +311,18 @@ public class GameManager : MonoBehaviour
         UpdateUIElements();
     }
 
+    public static int AddPickupScore(int baseScore)
+    {
+        if (instance == null || instance.gameIsOver)
+        {
+            return 0;
+        }
+
+        int awardedScore = instance.Combo.Collect(baseScore, Time.time);
+        AddScore(awardedScore);
+        return awardedScore;
+    }
+
     /// <summary>
     /// Description:
     /// Saves the highscore and then resets the current player score
@@ -299,6 +331,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public static void ResetScore()
     {
+        instance.ResetPickupCombo();
         PlayerPrefs.SetInt("score", 0);
         score = 0;
     }
@@ -345,6 +378,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public static void ResetGamePlayerPrefs()
     {
+        instance.ResetPickupCombo();
         PlayerPrefs.SetInt("score", 0);
         score = 0;
         PlayerPrefs.SetInt("lives", 0);

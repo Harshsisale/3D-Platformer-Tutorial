@@ -28,6 +28,8 @@ public class ThirdPersonCharacterController : MonoBehaviour
     public InputAction moveInput;
     [Tooltip("The input action(s) that map to jumping")]
     public InputAction jumpInput;
+    public InputAction sprintInput = new InputAction("Sprint", InputActionType.Button);
+    public InputAction dashInput = new InputAction("Dash", InputActionType.Button);
 
     [Header("Effects settings")]
     [Tooltip("The effect to create when jumping")]
@@ -46,8 +48,20 @@ public class ThirdPersonCharacterController : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
+        if (sprintInput.bindings.Count == 0)
+        {
+            sprintInput.AddBinding("<Keyboard>/leftShift");
+            sprintInput.AddBinding("<Gamepad>/leftStickPress");
+        }
+        if (dashInput.bindings.Count == 0)
+        {
+            dashInput.AddBinding("<Keyboard>/e");
+            dashInput.AddBinding("<Gamepad>/buttonEast");
+        }
         moveInput.Enable();
         jumpInput.Enable();
+        sprintInput.Enable();
+        dashInput.Enable();
     }
 
     /// <summary>
@@ -57,6 +71,9 @@ public class ThirdPersonCharacterController : MonoBehaviour
     {
         moveInput.Disable();
         jumpInput.Disable();
+        sprintInput.Disable();
+        dashInput.Disable();
+        ResetMovement();
     }
 
     /// <summary>
@@ -103,6 +120,13 @@ public class ThirdPersonCharacterController : MonoBehaviour
         {
             GetComponent<Rigidbody>().useGravity = false;
         }
+
+        if (dashSound != null)
+        {
+            dashAudioSource = gameObject.AddComponent<AudioSource>();
+            dashAudioSource.playOnAwake = false;
+            dashAudioSource.spatialBlend = 0f;
+        }
     }
 
     /// <summary>
@@ -122,7 +146,13 @@ public class ThirdPersonCharacterController : MonoBehaviour
             return;
         }
         MatchCameraYRotation();
-        CentralizedControl(moveInput.ReadValue<Vector2>().x, moveInput.ReadValue<Vector2>().y, jumpInput.triggered);
+        Vector2 movement = Vector2.ClampMagnitude(moveInput.ReadValue<Vector2>(), 1f);
+        dashCooldownRemaining = Mathf.Max(0f, dashCooldownRemaining - Time.deltaTime);
+        if (dashInput.WasPressedThisFrame() && playerHealth.currentHealth > 0)
+        {
+            TryDash(movement);
+        }
+        CentralizedControl(movement.x, movement.y, jumpInput.triggered);
     }
 
     [Header("Related Gameobjects / Scripts needed for determining control states")]
@@ -151,6 +181,8 @@ public class ThirdPersonCharacterController : MonoBehaviour
     [Header("Speed Control")]
     [Tooltip("The speed at which to move the player")]
     public float moveSpeed = 5f;
+    [Tooltip("Walking speed multiplier while sprint is held")]
+    public float sprintMultiplier = 1.75f;
     [Tooltip("The strength with which to jump")]
     public float jumpStrength = 8.0f;
     [Tooltip("The strength of gravity on this controller")]
@@ -158,6 +190,42 @@ public class ThirdPersonCharacterController : MonoBehaviour
 
     [Tooltip("The amount of downward movement to register as falling")]
     public float fallAmount = -9.0f;
+
+    [Header("Dash")]
+    [Min(0f)] public float dashSpeed = 25f;
+    [Min(0.01f)] public float dashDuration = 0.2f;
+    [Min(0f)] public float dashCooldown = 1f;
+    public AudioClip dashSound;
+    [Range(0f, 1f)] public float dashVolume = 0.6f;
+
+    private AudioSource dashAudioSource;
+    private Vector3 dashDirection;
+    private float dashTimeRemaining;
+    private float dashCooldownRemaining;
+
+    public bool IsDashing => dashTimeRemaining > 0f;
+    public float DashCooldownRemaining => dashCooldownRemaining;
+
+    private void TryDash(Vector2 movement)
+    {
+        if (IsDashing || dashCooldownRemaining > 0f)
+        {
+            return;
+        }
+
+        dashDirection = transform.TransformDirection(new Vector3(movement.x, 0f, movement.y));
+        if (dashDirection.sqrMagnitude < 0.01f)
+        {
+            dashDirection = playerRepresentation != null ? playerRepresentation.transform.forward : transform.forward;
+        }
+        dashDirection = Vector3.ProjectOnPlane(dashDirection, Vector3.up).normalized;
+        dashTimeRemaining = dashDuration;
+        dashCooldownRemaining = dashCooldown;
+        if (dashAudioSource != null && dashSound != null)
+        {
+            dashAudioSource.PlayOneShot(dashSound, dashVolume);
+        }
+    }
 
     // The direction the player is moving in
     private Vector3 moveDirection = Vector3.zero;
@@ -213,6 +281,7 @@ public class ThirdPersonCharacterController : MonoBehaviour
     /// <param name="jumpPressed">"Wheter or not the jump input has been pressed"</param>
     void NormalControl(float leftRightMovementAxis, float forwardBackwardMovementAxis, bool jumpPressed)
     {
+        float currentMoveSpeed = moveSpeed * (sprintInput.IsPressed() ? sprintMultiplier : 1f);
         // The input corresponding to the left and right movement
         float leftRightInput = leftRightMovementAxis;
         // The input corresponding to the forward and backward movement
@@ -244,7 +313,7 @@ public class ThirdPersonCharacterController : MonoBehaviour
             moveDirection = transform.TransformDirection(moveDirection);
 
             // Apply the movement speed to the movement direction
-            moveDirection *= moveSpeed;
+            moveDirection *= currentMoveSpeed;
 
             // If the player has pressed the jump button, apply to the y movement the jump strength
             if (jumpPressed)
@@ -271,7 +340,7 @@ public class ThirdPersonCharacterController : MonoBehaviour
         {
             // Apply move direction with the input and move speed to the x and z
             // Apply the previous move direction y to this current move direction y
-            moveDirection = new Vector3(leftRightInput * moveSpeed + xForce, moveDirection.y, forwardBackwardInput * moveSpeed + zForce);
+            moveDirection = new Vector3(leftRightInput * currentMoveSpeed + xForce, moveDirection.y, forwardBackwardInput * currentMoveSpeed + zForce);
             // transform the movement direction to be in world space (because we want to move in relation to the world not ourselves)
             moveDirection = transform.TransformDirection(moveDirection);
 
@@ -315,7 +384,23 @@ public class ThirdPersonCharacterController : MonoBehaviour
         }
 
         // Pass the calculated move direction multiplied by the time inbetween freames to the charater controller move function
-        characterController.Move(moveDirection * Time.deltaTime);
+        Vector3 movement = moveDirection * Time.deltaTime;
+        if (IsDashing)
+        {
+            float dashStep = Mathf.Min(dashTimeRemaining, Time.deltaTime);
+            movement.x += (dashDirection.x * dashSpeed - moveDirection.x) * dashStep;
+            movement.z += (dashDirection.z * dashSpeed - moveDirection.z) * dashStep;
+            dashTimeRemaining = Mathf.Max(0f, dashTimeRemaining - Time.deltaTime);
+            if (characterController.isGrounded && !jumpPressed)
+            {
+                playerState = PlayerState.Moving;
+            }
+        }
+        CollisionFlags collisions = characterController.Move(movement);
+        if ((collisions & CollisionFlags.Sides) != 0)
+        {
+            dashTimeRemaining = 0f;
+        }
 
 
         // Make all assigned followers do their following of the player now
@@ -338,6 +423,7 @@ public class ThirdPersonCharacterController : MonoBehaviour
     /// <param name="bounceJumpButtonHeldMultiplyer">The force to multiply jump strength by when bounce is called and the jump button is held down</param>
     public void Bounce(float bounceForceMultiplier, float bounceJumpButtonHeldMultiplyer, bool applyHorizontalForce)
     {
+        dashTimeRemaining = 0f;
         bounced = true;
         playerState = PlayerState.Jumping;
         if (jumpInput.ReadValue<float>() != 0)
@@ -367,6 +453,7 @@ public class ThirdPersonCharacterController : MonoBehaviour
     /// </summary>
     void DeadControl()
     {
+        dashTimeRemaining = 0f;
         playerState = PlayerState.Dead;
         moveDirection = new Vector3(0, moveDirection.y, 0);
         moveDirection = transform.TransformDirection(moveDirection);
@@ -405,6 +492,7 @@ public class ThirdPersonCharacterController : MonoBehaviour
     /// </summary>
     public void MoveToPosition(Vector3 newPosition)
     {
+        ResetMovement();
         // must turn off the Character Controller prior to moving, as when on, the Character Controller controls all movement
         characterController.enabled = false;
 
@@ -413,6 +501,21 @@ public class ThirdPersonCharacterController : MonoBehaviour
 
         // turn character controller back on
         characterController.enabled = true;
+    }
+
+    public void ResetMovement()
+    {
+        moveDirection = Vector3.zero;
+        dashDirection = Vector3.zero;
+        dashTimeRemaining = 0f;
+        dashCooldownRemaining = 0f;
+        xForce = 0f;
+        zForce = 0f;
+        bounced = false;
+        landed = false;
+        doubleJumpAvailable = true;
+        timeToStopBeingLenient = 0f;
+        playerState = PlayerState.Idle;
     }
 
 }

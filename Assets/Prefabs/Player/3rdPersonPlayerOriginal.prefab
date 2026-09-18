@@ -418,6 +418,56 @@ MonoBehaviour:
       m_Action: Jump Input
       m_Flags: 0
     m_Flags: 0
+  sprintInput:
+    m_Name: Sprint
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: 790134d7-2b7a-4e4d-83bd-2624560661d8
+    m_Processors:
+    m_Interactions:
+    m_SingletonActionBindings:
+    - m_Name:
+      m_Id: 0a638e4c-8b11-4d3f-b840-4a60338da025
+      m_Path: <Keyboard>/leftShift
+      m_Interactions:
+      m_Processors:
+      m_Groups:
+      m_Action: Sprint
+      m_Flags: 0
+    - m_Name:
+      m_Id: a5d332f9-77ff-428f-be82-fbd218acddd9
+      m_Path: <Gamepad>/leftStickPress
+      m_Interactions:
+      m_Processors:
+      m_Groups:
+      m_Action: Sprint
+      m_Flags: 0
+    m_Flags: 0
+  dashInput:
+    m_Name: Dash
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: 924eb433-1d50-446f-bac5-5ba900a26489
+    m_Processors:
+    m_Interactions:
+    m_SingletonActionBindings:
+    - m_Name:
+      m_Id: 9170a34d-87e0-4b64-92c4-6416a17703a3
+      m_Path: <Keyboard>/e
+      m_Interactions:
+      m_Processors:
+      m_Groups:
+      m_Action: Dash
+      m_Flags: 0
+    - m_Name:
+      m_Id: 8a29d10c-8249-4cf2-a947-0b30834dfccf
+      m_Path: <Gamepad>/buttonEast
+      m_Interactions:
+      m_Processors:
+      m_Groups:
+      m_Action: Dash
+      m_Flags: 0
+    m_Flags: 0
   jumpEffect: {fileID: 4610668429884910356, guid: 4d48cf31a1e48e146855fc6bc0fed464,
     type: 3}
   doubleJumpEffect: {fileID: 4610668429884910356, guid: bdf78056666ddc9469568020947782c0,
@@ -430,9 +480,15 @@ MonoBehaviour:
   playerCamera: {fileID: 1043106523561299443}
   playerRepresentation: {fileID: 1043106522671859510}
   moveSpeed: 10
+  sprintMultiplier: 1.75
   jumpStrength: 12
   gravity: 20
   fallAmount: -9
+  dashSpeed: 25
+  dashDuration: 0.2
+  dashCooldown: 1
+  dashSound: {fileID: 8300000, guid: 921d665d31e6c42509baf46a81ee4078, type: 3}
+  dashVolume: 0.6
   jumpTimeLeniency: 0.1
 --- !u!114 &9117636268688198088
 MonoBehaviour:

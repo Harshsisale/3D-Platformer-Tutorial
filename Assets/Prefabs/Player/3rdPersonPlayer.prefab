@@ -311,6 +311,56 @@ MonoBehaviour:
       m_Action: Jump Input
       m_Flags: 0
     m_Flags: 0
+  sprintInput:
+    m_Name: Sprint
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: db2e6db7-4590-4e5b-8f33-b4bcf749e694
+    m_Processors:
+    m_Interactions:
+    m_SingletonActionBindings:
+    - m_Name:
+      m_Id: eaa5434d-0120-4746-9a96-ebc8bbc2786e
+      m_Path: <Keyboard>/leftShift
+      m_Interactions:
+      m_Processors:
+      m_Groups:
+      m_Action: Sprint
+      m_Flags: 0
+    - m_Name:
+      m_Id: 248e2a2e-fe69-4c89-9f15-28050e167c34
+      m_Path: <Gamepad>/leftStickPress
+      m_Interactions:
+      m_Processors:
+      m_Groups:
+      m_Action: Sprint
+      m_Flags: 0
+    m_Flags: 0
+  dashInput:
+    m_Name: Dash
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: 973d6bed-6d76-4700-8873-620d3ba563d3
+    m_Processors:
+    m_Interactions:
+    m_SingletonActionBindings:
+    - m_Name:
+      m_Id: 28e82ecf-cd83-4724-8b86-b0278115791e
+      m_Path: <Keyboard>/e
+      m_Interactions:
+      m_Processors:
+      m_Groups:
+      m_Action: Dash
+      m_Flags: 0
+    - m_Name:
+      m_Id: 400949fc-7500-4e63-aaf5-fc202be39660
+      m_Path: <Gamepad>/buttonEast
+      m_Interactions:
+      m_Processors:
+      m_Groups:
+      m_Action: Dash
+      m_Flags: 0
+    m_Flags: 0
   jumpEffect: {fileID: 4610668429884910356, guid: 4d48cf31a1e48e146855fc6bc0fed464,
     type: 3}
   doubleJumpEffect: {fileID: 4610668429884910356, guid: bdf78056666ddc9469568020947782c0,
@@ -322,9 +372,15 @@ MonoBehaviour:
   playerCamera: {fileID: 1043106523561299443}
   playerRepresentation: {fileID: 1043106522671859510}
   moveSpeed: 10
+  sprintMultiplier: 1.75
   jumpStrength: 12
   gravity: 20
   fallAmount: -9
+  dashSpeed: 25
+  dashDuration: 0.2
+  dashCooldown: 1
+  dashSound: {fileID: 8300000, guid: 921d665d31e6c42509baf46a81ee4078, type: 3}
+  dashVolume: 0.6
   jumpTimeLeniency: 0.1
 --- !u!114 &9117636268688198088
 MonoBehaviour:
@@ -1258,6 +1314,7 @@ GameObject:
   - component: {fileID: 5276450386779530256}
   - component: {fileID: 536511569638500493}
   - component: {fileID: 1310759765686542525}
+  - component: {fileID: 8300102345678901234}
   m_Layer: 0
   m_Name: FreeLook Camera
   m_TagString: Untagged
@@ -1809,3 +1866,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d212264b918550645a5488bcf97bc74b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8300102345678901234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3783379204645422851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d52788ec7c452d953ec113f0f519ce, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
